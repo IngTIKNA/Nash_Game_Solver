@@ -5,6 +5,6 @@
 #===========================================================#
 ## clone eigne
 url_eigen="https://gitlab.com/libeigen/eigen.git"
-dir="External/Eigen"
+dir="libs/Eigen"
 git clone "$url_eigen" "$dir"
 #===========================================================#
