@@ -1,45 +1,47 @@
 /*
  * NashGame.cpp
  *
- *  Created on: Nov 21, 2022
+ *  Created on: Nov 28, 2022
  *      Author: Ahmet Tikna
  */
 
 #include "NashGame.h"
 
 NashGame::NashGame() {
-	// TODO Auto-generated constructor stub
+        // TODO Auto-generated constructor stub
 
 }
 
-NashGame::NashGame(PayoffMatrix row_player_payoff, PayoffMatrix col_player_payoff){
+NashGame::NashGame(PayoffVector row_player_payoff, PayoffVector col_player_payoff){
 
-	this->RowPlayer    = row_player_payoff;
-	this->ColumnPlayer = col_player_payoff;
+        const Eigen::MatrixXd payoff_matrix_1 = this->convert_vvd_to_matrix(row_player_payoff);
+        const Eigen::MatrixXd payoff_matrix_2 = this->convert_vvd_to_matrix(col_player_payoff);
 
-	std::string path_leader = "payoff_leader.csv";
-	std::ofstream payoff_leader(path_leader);
+        this->RowPlayer    = payoff_matrix_1;
+        this->ColumnPlayer = payoff_matrix_2;
 
-	std::string path_follower = "payoff_follower.csv";
-	std::ofstream payoff_follower(path_follower);
+        std::string path_leader = "payoff_leader.csv";
+        std::ofstream payoff_leader(path_leader);
 
+        std::string path_follower = "payoff_follower.csv";
+        std::ofstream payoff_follower(path_follower);
 
-	Eigen::IOFormat CleanFmt(4, 0, ", ", "\n");
+        Eigen::IOFormat CleanFmt(4, 0, ", ", "\n");
 
-	payoff_leader << row_player_payoff.format(CleanFmt);
-	payoff_follower << col_player_payoff.format(CleanFmt);
+        payoff_leader << payoff_matrix_1.format(CleanFmt);
+        payoff_follower << payoff_matrix_2.format(CleanFmt);
 
-	std::cout << " First (Row) Player " << std::endl;
-	std::cout << row_player_payoff << std::endl;
+        std::cout << " First (Row) Player " << std::endl;
+        std::cout << payoff_matrix_1 << std::endl;
 
-	std::cout << " Second (Column) Player " << std::endl;
-	std::cout << col_player_payoff << std::endl;
+        std::cout << " Second (Column) Player " << std::endl;
+        std::cout << payoff_matrix_2 << std::endl;
 
 }
 
 
 NashGame::~NashGame() {
-	// TODO Auto-generated destructor stub
+        // TODO Auto-generated destructor stub
 }
 
 
@@ -108,7 +110,7 @@ std::vector<int> NashGame::non_basic_variables(const Eigen::MatrixXd &tableau) {
 
 std::vector<int> NashGame::pivot_tableau(Eigen::MatrixXd &tableau, int column_index) {
 
-	std::vector<int> original_labels = non_basic_variables(tableau);
+        std::vector<int> original_labels = non_basic_variables(tableau);
     const int pivot_row_index = find_pivot_row(tableau, column_index);
     double pivot_element = tableau(pivot_row_index, column_index);
 
@@ -122,9 +124,9 @@ std::vector<int> NashGame::pivot_tableau(Eigen::MatrixXd &tableau, int column_in
 
 
     for(auto& org_var: original_labels){
-    	std::vector<int>::iterator position = std::find(non_basic_vars.begin(), non_basic_vars.end(), org_var);
-    	if (position != non_basic_vars.end())
-    		non_basic_vars.erase(position);
+        std::vector<int>::iterator position = std::find(non_basic_vars.begin(), non_basic_vars.end(), org_var);
+        if (position != non_basic_vars.end())
+                non_basic_vars.erase(position);
     }
 
     return non_basic_vars;
@@ -148,7 +150,7 @@ Eigen::MatrixXd NashGame::shift_tableau(Eigen::MatrixXd tableau, int num_rows, i
 
 
 Eigen::VectorXd NashGame::tableau_to_strategy(Eigen::MatrixXd tableau, std::vector<int> basic_labels, const int strategy_labels){
-	std::vector<double> vertex;
+        std::vector<double> vertex;
     for (int column=0; column < strategy_labels; column++) {
         if (std::find(basic_labels.begin(), basic_labels.end(),column)!=basic_labels.end()) {
             for (int i = 0; i < tableau.rows(); i++) {
@@ -169,7 +171,7 @@ Eigen::VectorXd NashGame::tableau_to_strategy(Eigen::MatrixXd tableau, std::vect
 
     std::cerr << "	=	=	=	=	=	=	=	=	=	=	=	" << std::endl;
     for(auto& nn_bs_var: basic_labels)
-    	std::cerr << "nn_bsc_var  : " << nn_bs_var << std::endl;
+        std::cerr << "nn_bsc_var  : " << nn_bs_var << std::endl;
 
     std::cerr << "strategy_labels  : " << strategy_labels << std::endl;
     std::cerr << strategy / sum << std::endl;
@@ -184,19 +186,19 @@ Eigen::VectorXd NashGame::tableau_to_strategy(Eigen::MatrixXd tableau, std::vect
 // 0
 void NashGame::combination(int n, int r, std::vector<std::vector<double>> &powerset){
 
-	std::vector<double> v(n);
-	std::fill(v.begin(), v.begin() + r, true);
+        std::vector<double> v(n);
+        std::fill(v.begin(), v.begin() + r, true);
 
-	do {
-		std::vector<double> elements;
-		for (int i = 0; i < n; ++i) {
-		   if (v[i]) {
-			   elements.push_back(i);
-		   }
-		}
-		if(elements.size() != 0)																//	(excluding the empty set)
-			powerset.push_back(elements);
-	} while (std::prev_permutation(v.begin(), v.end()));
+        do {
+                std::vector<double> elements;
+                for (int i = 0; i < n; ++i) {
+                   if (v[i]) {
+                           elements.push_back(i);
+                   }
+                }
+                if(elements.size() != 0)																//	(excluding the empty set)
+                        powerset.push_back(elements);
+        } while (std::prev_permutation(v.begin(), v.end()));
 
 }
 
@@ -204,13 +206,13 @@ void NashGame::combination(int n, int r, std::vector<std::vector<double>> &power
 // 1
 std::vector<std::vector<double>> NashGame::powerset(int n){
 
-	std::vector<std::vector<double>> powerset;
+        std::vector<std::vector<double>> powerset;
 
-	#pragma omp parallel for													// parallelize
-	for(int i=0; i <= n; i++)
-		this->combination(n, i, powerset);
+        #pragma omp parallel for													// parallelize
+        for(int i=0; i <= n; i++)
+                this->combination(n, i, powerset);
 
-	return powerset;
+        return powerset;
 
 }
 
@@ -226,57 +228,38 @@ bool NashGame::solve_indifference(const PayoffMatrix& A, Eigen::VectorXd &prob, 
     Eigen::MatrixXd M(m, n);
     std::vector<double> rows_rotated(rows);
 
-
     if (m != 0) {
-    	std::rotate(rows_rotated.begin(), rows_rotated.begin() + (rows_rotated.size()- 1), rows_rotated.end());				//	Vector is shifted forward by one
+                std::rotate(rows_rotated.begin(), rows_rotated.begin() + (rows_rotated.size()- 1), rows_rotated.end());				//	Vector is shifted forward by one
 
-    	for (int i = 0 ; i < m-1; ++i) {
-            M.row(i) = A.row(rows[i]) - A.row(rows_rotated[i]);
-        }
+                for (int i = 0 ; i < m-1; ++i) {
+                        M.row(i) = A.row(rows[i]) - A.row(rows_rotated[i]);
+                }
     }
 
+    Eigen::MatrixXd Z(1, n);
+    Z.row(0).setOnes();
 
-    //==================================//
-    std::set<int> zero_columns;
-
-    for (int i = 0; i < n; ++i) {
-        zero_columns.insert(i);
-    }
-    //	=	=	=	=	=	//
-    for (int j : columns) {
-        zero_columns.erase(j);
-    }
-    //==================================//
-
-
-    if (!zero_columns.empty()) {
-        Eigen::MatrixXd Z(1, n);
-        Z.row(0).setZero();
-        for (int j : zero_columns) {
-        	Z(0, j) = 1;
-        }
-        M.row(m-2) = Z;
-    }
+    for (int j : columns)
+        Z(0, j) = 0;
+    M.row(m-1) = Z;
 
     //	Set the last row to ones
-    M.row(m-1).setOnes();
+    Z.row(0).setOnes();
+    Eigen::MatrixXd M_new(M.rows()+1, M.cols());
+    M_new << M, Z;
 
-    Eigen::VectorXd b(m);
+    Eigen::VectorXd b(m+1);
     b.setZero();
-    b(m-1) = 1;
+    b(m) = 1;
 
-    Eigen::FullPivLU<Eigen::MatrixXd> lu(M);
+    Eigen::FullPivLU<Eigen::MatrixXd> lu(M_new);
     prob = lu.solve(b);
 
-	//std::cerr << "prob.size : " << prob.cols() << std::endl;
-	//std::cerr << prob << std::endl;
-
     if((prob.array() >= 0).all()){
-    	return true;
+        return true;
     }
 
     return false;
-
 }
 
 
@@ -285,12 +268,12 @@ bool NashGame::solve_indifference(const PayoffMatrix& A, Eigen::VectorXd &prob, 
 // 3
 SupportPairs NashGame::potential_support_pairs(bool non_degenerate){
 
-	int p1_num_strategies = this->RowPlayer.rows();
+        int p1_num_strategies = this->RowPlayer.rows();
     int p2_num_strategies = this->RowPlayer.cols();
     auto p1_supports = this->powerset(p1_num_strategies);
 
     std::vector<std::pair<std::vector<double>, std::vector<double>>> result;
-	#pragma omp parallel for													// parallelize
+        #pragma omp parallel for													// parallelize
     for (const auto& support1 : p1_supports) {
         if (support1.empty()) continue;
         auto p2_supports = powerset(p2_num_strategies);
@@ -308,10 +291,10 @@ SupportPairs NashGame::potential_support_pairs(bool non_degenerate){
 
 bool NashGame::obey_support(Eigen::VectorXd strategy_prob, std::vector<double> support_vec){
 
-	double *ptr_support = &support_vec[0];
+        double *ptr_support = &support_vec[0];
     Eigen::Map<Eigen::VectorXd> support(ptr_support, support_vec.size());
 
-	if (strategy_prob.size() == 0) {
+        if (strategy_prob.size() == 0) {
         return false;
     }
     for (int i = 0; i < strategy_prob.size(); ++i) {
@@ -330,107 +313,100 @@ bool NashGame::obey_support(Eigen::VectorXd strategy_prob, std::vector<double> s
 
 ProbabilityVectors NashGame::indifference_strategies(){
 
-	ProbabilityVectors probVector;
+        ProbabilityVectors probVector;
 
-	int tolerance = std::min(this->tol, 0.);
+        int tolerance = std::min(this->tol, 0.);
 
-	SupportPairs pairs = this->potential_support_pairs(false);
+        SupportPairs pairs = this->potential_support_pairs(false);
 
-	for(auto& pair: pairs){
+        for(auto& pair: pairs){
 
-	    Eigen::VectorXd prob1, prob2;
+            Eigen::VectorXd prob1, prob2;
 
-	    bool res1 = this->solve_indifference(this->RowPlayer, prob2, pair.first , pair.second);
-	    bool res2 = this->solve_indifference(this->ColumnPlayer.transpose(), prob1, pair.second, pair.first);
+            bool res1 = this->solve_indifference(this->ColumnPlayer.transpose(), prob1, pair.second, pair.first);
+            bool res2 = this->solve_indifference(this->RowPlayer, prob2, pair.first, pair.second);
 
-	     if(res1 & res2){
+             if(res1 & res2){
+                 bool os_1 = this->obey_support(prob1, pair.first);
+                 bool os_2 = this->obey_support(prob2, pair.second);
 
-	 	    bool os_1 = this->obey_support(prob1, pair.first);
-	 	    bool os_2 = this->obey_support(prob2, pair.second);
+                 if(os_1 & os_2){
+                         probVector.push_back({prob1, prob2, pair.first, pair.second});
+                 }
+             }
+        }
 
-	 	    if(os_1 & os_2){
-	 	    	probVector.push_back({prob1, prob2, pair.first, pair.second});
-	 	    	//std::cerr << "======================" << std::endl;
-	 	    	//std::cerr << prob1 << std::endl;
-	 	    	//std::cerr << "==" << std::endl;
-				//std::cerr << prob2 << std::endl;
-	 	    	//std::cerr << "======================" << std::endl;
-	 	    }
-	     }
-
-	}
-
-	return probVector;
+        return probVector;
 }
 
 
 
 bool NashGame::is_Nash(ProbabilityVector pv){
 
-	std::vector<int> row_support_indices, column_support_indices;
+        std::vector<double> row_support_indices, column_support_indices;
 
-	for (const auto& double_element : std::get<2>(pv)) {
-		row_support_indices.push_back(static_cast<int>(double_element));
-	}
+        for (const auto& double_element : std::get<2>(pv)) {
+                row_support_indices.push_back(double_element);
+        }
 
-	for (const auto& double_element : std::get<3>(pv)) {
-		column_support_indices.push_back(static_cast<int>(double_element));
-	}
+        for (const auto& double_element : std::get<3>(pv)) {
+                column_support_indices.push_back(double_element);
+        }
 
-	auto u = std::get<1>(pv);
-	Eigen::VectorXd row_payoffs = this->RowPlayer * u;
+        auto u = std::get<1>(pv);
+        Eigen::VectorXd row_payoffs = this->RowPlayer * u;
 
-	auto v = std::get<0>(pv);
-	Eigen::VectorXd column_payoffs = this->ColumnPlayer.transpose() * v;
+        auto v = std::get<0>(pv);
+        Eigen::VectorXd column_payoffs = this->ColumnPlayer.transpose() * v;
 
-	int* ptr_row_ids = &row_support_indices[0];
-	Eigen::Map<Eigen::ArrayXi> row_sups(ptr_row_ids, row_support_indices.size());
+        double* ptr_row_ids = &row_support_indices[0];
+        Eigen::Map<Eigen::ArrayXd> row_sups(ptr_row_ids, row_support_indices.size());
 
-	int* ptr_col_ids = &column_support_indices[0];
-	Eigen::Map<Eigen::ArrayXi> col_sups(ptr_col_ids, column_support_indices.size());
-
-	//std::cerr << "row_sups : " << row_sups << std::endl;
-	//std::cerr << "col_sups : " << col_sups << std::endl;
-
-	Eigen::VectorXd row_support_payoffs = row_payoffs(row_sups);
-	Eigen::VectorXd column_support_payoffs = column_payoffs(col_sups);
+        double* ptr_col_ids = &column_support_indices[0];
+        Eigen::Map<Eigen::ArrayXd> col_sups(ptr_col_ids, column_support_indices.size());
 
 
-	//std::cerr << "ROW SUPPORT PO: " << row_support_payoffs << std::endl;
-	//std::cerr << "COL SUPPORT PO: " << column_support_payoffs << std::endl;
+        Eigen::VectorXd row_support_payoffs = row_payoffs(row_sups);
+        Eigen::VectorXd column_support_payoffs = column_payoffs(col_sups);
 
-	return (
-	        row_payoffs.maxCoeff() == row_support_payoffs.maxCoeff()
-	        && column_payoffs.maxCoeff() == column_support_payoffs.maxCoeff()
-	);
+        return (
+                row_payoffs.maxCoeff() == row_support_payoffs.maxCoeff()
+                && column_payoffs.maxCoeff() == column_support_payoffs.maxCoeff()
+        );
 }
 
 
 
 void NashGame::support_enumeration(){
 
-	int num_eq = 0;																											//	The number of equilibria in the matrix
-	std::vector<std::pair<Eigen::VectorXd,Eigen::VectorXd>> nash_equilibrias;
+        int num_eq = 0;																											//	The number of equilibria in the matrix
+        std::vector<std::pair<Eigen::VectorXd,Eigen::VectorXd>> nash_equilibrias;
 
-	ProbabilityVectors probability_vectors = this->indifference_strategies();
+        ProbabilityVectors probability_vectors = this->indifference_strategies();
 
-	for(auto& prob_elmnt : probability_vectors){
-		bool is_nash = this->is_Nash(prob_elmnt);
-		if(is_nash){
-			std::cerr << std::endl;
-			std::cerr << "============== NASH EQUILIBRIA ===========" << std::endl;
-			std::cerr << "==========================================" << std::endl;
-			std::cerr << "Row player    (1): " << std::get<0>(prob_elmnt).transpose() << std::endl;
-			std::cerr << "Column player (2) : " << std::get<1>(prob_elmnt).transpose() << std::endl;
-			std::cerr << "==========================================" << std::endl;
-			nash_equilibrias.push_back({std::get<0>(prob_elmnt),std::get<1>(prob_elmnt)});
-			num_eq++;
-		}
-	}
+        for(auto& prob_elmnt : probability_vectors){
+                bool is_nash = this->is_Nash(prob_elmnt);
+                //bool is_nash = true;
+                if(is_nash){
+                        nash_equilibrias.push_back({std::get<0>(prob_elmnt),std::get<1>(prob_elmnt)});
+                        num_eq++;
+                }
+        }
 
-	if(num_eq){
-
-	}
+        if(num_eq%2 == 0){
+                std::cerr << "==========================================" << std::endl;
+                std::cerr << "====== WARNING : Degenerate Game =========" << std::endl;
+                std::cerr << "==========================================" << std::endl;
+        }else{
+                for(auto& eq : nash_equilibrias){
+                        std::cerr << std::endl;
+                        std::cerr << "============== NASH EQUILIBRIA ===========" << std::endl;
+                        std::cerr << "==========================================" << std::endl;
+                        std::cerr << "Row player    (1) : [" << eq.first.transpose()   << "]" << std::endl;
+                        std::cerr << "Column player (2) : [" << eq.second.transpose() << "]" << std::endl;
+                        std::cerr << "==========================================" << std::endl;
+                }
+        }
 
 
 }
