@@ -15,12 +15,10 @@ Install Nash Game Solver dependencies.
 ```sh
 chmod +x install.sh
 ./install.sh
-cmake CMakeLists.txt
-make
-./NASH
 
 ```
 
 ## References
 
 - [Algorthmic Game Theory](https://www.cs.cmu.edu/~sandholm/cs15-892F13/algorithmic-game-theory.pdf) - Noam Nisan
+- [Nashpy] (https://github.com/drvinceknight/Nashpy)
