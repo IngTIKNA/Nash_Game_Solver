@@ -2,7 +2,7 @@
  * test_nash.cpp
  *
  *  Created on: April 15, 2023
- *      Author: Ahmet Tikna 
+ *      Author: Ahmet Tikna
  */
 
 #define CATCH_CONFIG_MAIN
@@ -11,87 +11,86 @@
 
 
 //__________________________________________________________________________________________________________________//
-//												SCENARIO 01															//
+//                                                SCENARIO 01                                                       //
 //__________________________________________________________________________________________________________________//
 
 SCENARIO(" A bimatrix(3x3) game (Non-degenerate) Nash-Game ")
 {
- 
+
     GIVEN("3x3 bimatrix game - Find the powerset") {
 
-        Eigen::MatrixXd first_payoff(3,3);
-        first_payoff << 3.1,3.1,3.1,
-                        3,3,3,
-                        -2.9,2.9,2.9;
+        //==========================================================//
+        //                     Payoff Matrices                      //
+        //==========================================================//
+        std::vector<std::vector<double>> row_player_payoff;
+        std::vector<std::vector<double>> col_player_payoff;
 
-        Eigen::MatrixXd second_payoff(3,3);
-        second_payoff<< 3,4,1,
-                        3,2,1,
-                        3,2,1;
+        std::vector<double> row_row_1{ 3.1, 3.1, 3.1 };
+        std::vector<double> row_row_2{   3,   3,   3 };
+        std::vector<double> row_row_3{-2.9, 2.9, 2.9 };
+        row_player_payoff.push_back(row_row_1);
+        row_player_payoff.push_back(row_row_2);
+        row_player_payoff.push_back(row_row_3);
 
-        NashGame NG(first_payoff, second_payoff);
+        std::vector<double> col_row_1{   3,   4,   1 };
+        std::vector<double> col_row_2{   3,   2,   1 };
+        std::vector<double> col_row_3{   3,   2,   1 };
+        col_player_payoff.push_back(col_row_1);
+        col_player_payoff.push_back(col_row_2);
+        col_player_payoff.push_back(col_row_3);
+        //==========================================================//
 
-        int p1_num_strategies = first_payoff.rows();
-        std::vector<std::vector<double>> powerset = NG.powerset(p1_num_strategies);
 
-        std::cerr << "Powerset size : " <<  powerset.size() << std::endl;
+        NashGame NG(row_player_payoff, col_player_payoff);
 
-        //for(auto& set: powerset){
-        //    for(auto& elm: set)
-        //        std::cerr <<  elm  << " - " << std::endl;    
-        //    std::cerr << std::endl;
-        //}
+        //==============================================================================//
+        //                             Generate power sets                              //
+        //==============================================================================//
+        int p1_num_strategies = row_player_payoff.size();                               //	row size
+        int p2_num_strategies = col_player_payoff.size();                               //	row size
+
+        std::vector<std::vector<double>> powerset1 = NG.powerset(p1_num_strategies);
+        std::vector<std::vector<double>> powerset2 = NG.powerset(p2_num_strategies);
+        //==============================================================================//
+
 
         //============================= TEST CASE 1 ================================//
-		//==================================================================//		//
-		WHEN("Number of elements in the powerset(excluding the empty set)"){//	    // 
-																			//		//
-		REQUIRE(powerset.size() == 7);     									//		//	assert
-																			//		//
-		}																	//		//
-		//==================================================================//		//
-		//==========================================================================//
+        //==================================================================//		//
+        WHEN("Number of elements in the powerset(excluding the empty set)"){//	    //
 
+        REQUIRE(powerset1.size() == 7);                                     //      //	assert
+        REQUIRE(powerset2.size() == 7);     								//      //	assert
 
+        }                                                                   //      //
+        //==================================================================//		//
+        //==========================================================================//
 
-        Eigen::VectorXd prob;        
+        Eigen::VectorXd prob;
         std::vector<double> rows_1;
         std::vector<double> columns_1;
 
         rows_1.push_back(0);
         columns_1.push_back(0);
 
-        bool res = NG.solve_indifference(first_payoff, prob, rows_1, columns_1);
-
-        std::cerr << "prob : " << std::endl;
-        std::cerr << prob(0,0) << std::endl;
-        std::cerr << prob(1,0) << std::endl;
-        std::cerr << prob(2,0) << std::endl;
+        bool res = NG.solve_indifference(NG.RowPlayer, prob, rows_1, columns_1);
 
         //============================= TEST CASE 2 ================================//
-		//==================================================================//		//
-		WHEN(" Verify prob vector"){                                        //	    // 
-																			//		//
-		REQUIRE(prob.size() == 3);     									    //		//	assert
-        REQUIRE(prob(0,0) == 1);     									    //		//	assert
-        REQUIRE(prob(1,0) == 0);     									    //		//	assert
-        REQUIRE(prob(2,0) == 0);     									    //		//	assert
-																			//		//
-		}																	//		//
-		//==================================================================//		//
-		//==========================================================================//
+        //==================================================================//		//
+        WHEN(" Verify prob vector"){                                                //
 
+        REQUIRE(prob.size() == 3);                                          //      //	assert
+        REQUIRE(prob(0,0) == 1);                                            //      //	assert
+        REQUIRE(prob(1,0) == 0);                                            //      //	assert
+        REQUIRE(prob(2,0) == 0);                                            //      //	assert
 
-
-
-
-
-
+        }                                                                           //
+        //==================================================================//		//
+        //==========================================================================//
 
 
 
     }
-        
+
 }
 
 
