@@ -56,13 +56,12 @@ SCENARIO(" A bimatrix(3x3) game (Non-degenerate) Nash-Game ")
 
         //============================= TEST CASE 1 ================================//
         //==================================================================//		//
-        WHEN("Number of elements in the powerset(excluding the empty set)"){//	    //
-
-        REQUIRE(powerset1.size() == 7);                                     //      //	assert
-        REQUIRE(powerset2.size() == 7);     								//      //	assert
-
+        WHEN("Number of elements in the powerset(excluding the empty set)") //      //
+        {
+        REQUIRE(powerset1.size() == 7);
+        REQUIRE(powerset2.size() == 7);
         }                                                                   //      //
-        //==================================================================//		//
+        //==================================================================//      //
         //==========================================================================//
 
         Eigen::VectorXd prob;
@@ -75,16 +74,16 @@ SCENARIO(" A bimatrix(3x3) game (Non-degenerate) Nash-Game ")
         bool res = NG.solve_indifference(NG.RowPlayer, prob, rows_1, columns_1);
 
         //============================= TEST CASE 2 ================================//
-        //==================================================================//		//
-        WHEN(" Verify prob vector"){                                                //
+        //==================================================================//      //
+        WHEN(" Verify prob vector"){
 
-        REQUIRE(prob.size() == 3);                                          //      //	assert
-        REQUIRE(prob(0,0) == 1);                                            //      //	assert
-        REQUIRE(prob(1,0) == 0);                                            //      //	assert
-        REQUIRE(prob(2,0) == 0);                                            //      //	assert
+        REQUIRE(prob.size() == 3);
+        REQUIRE(prob(0,0) == 1);
+        REQUIRE(prob(1,0) == 0);
+        REQUIRE(prob(2,0) == 0);
 
-        }                                                                           //
-        //==================================================================//		//
+        }
+        //==================================================================//      //
         //==========================================================================//
 
 
