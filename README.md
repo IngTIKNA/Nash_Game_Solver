@@ -15,6 +15,11 @@ Install Nash Game Solver dependencies.
 ```sh
 chmod +x install.sh
 ./install.sh
+
+
+cmake CMakeLists.txt
+make
+
 ```
 
 ## References
